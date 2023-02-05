@@ -70,3 +70,4 @@ The executable will be located in the `zig-out` directory.
 
 - The ZIG team and foundation for making such an amazing language. [Sponsor](https://github.com/sponsors/ziglang)
 - MasterQ32 for the `zig-network` library providing async I/O. [Sponsor](https://github.com/sponsors/MasterQ32)
+- Everyone willing to contribute
