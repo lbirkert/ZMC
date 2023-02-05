@@ -1,0 +1,16 @@
+.{
+    .address = "0.0.0.0",
+    .port = 25565,
+    .gateways = .{
+        .{
+            .hostname = "mctest1.local",
+            .address = "127.0.0.1",
+            .port = 25566,
+        },
+        .{
+            .hostname = "mctest2.local",
+            .address = "127.0.0.1",
+            .port = 25567,
+        },
+    },
+}
