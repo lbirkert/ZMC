@@ -14,6 +14,7 @@ const Config = @This();
 
 endpoint: EndPoint,
 gateways: std.StringHashMapUnmanaged(EndPoint),
+fallback: ?EndPoint,
 
 pub fn print(self: *Config) void {
     std.log.info("### CONFIGURATION ###", .{});
@@ -24,6 +25,10 @@ pub fn print(self: *Config) void {
     var it = self.gateways.iterator();
     while (it.next()) |entry| {
         std.log.info("\t - {s} -> {}", .{ entry.key_ptr.*, entry.value_ptr });
+    }
+
+    if (self.fallback) |fallback| {
+        std.log.info("* fallback: {}", .{fallback});
     }
 
     std.log.info("### CONFIGURATION ###\n", .{});
@@ -69,7 +74,7 @@ pub fn parse(gpa: Allocator, ast: std.zig.Ast) !Config {
 
     try p.parseRoot(main_node_index);
 
-    return .{ .gateways = p.gateways, .endpoint = p.endpoint };
+    return .{ .gateways = p.gateways, .endpoint = p.endpoint, .fallback = p.fallback };
 }
 
 const Parse = struct {
@@ -80,22 +85,46 @@ const Parse = struct {
 
     endpoint: EndPoint = undefined,
     gateways: std.StringHashMapUnmanaged(EndPoint),
+    fallback: ?EndPoint = null,
 
     fn parseRoot(p: *Parse, node: Ast.Node.Index) !void {
-        const ast = p.ast;
-
         var buf: [2]Ast.Node.Index = undefined;
-        const struct_init = ast.fullStructInit(&buf, node) orelse return error.ParseError;
+        const struct_init = p.ast.fullStructInit(&buf, node) orelse return error.ParseError;
 
         var port: ?u16 = null;
         var address: ?[]const u8 = null;
 
         for (struct_init.ast.fields) |field_init| {
-            const name_token = ast.firstToken(field_init) - 2;
+            const name_token = p.ast.firstToken(field_init) - 2;
             const field_name = try identifierTokenString(p, name_token);
             if (mem.eql(u8, field_name, "gateways")) {
                 try parseGateways(p, field_init);
             } else if (mem.eql(u8, field_name, "port")) {
+                port = try parseInt(u16, p, field_init);
+            } else if (mem.eql(u8, field_name, "address")) {
+                address = try parseString(p, field_init);
+            } else if (mem.eql(u8, field_name, "fallback")) {
+                p.fallback = try parseFallback(p, field_init);
+            }
+        }
+
+        const endpoint_list = try network.getEndpointList(p.gpa, address.?, port.?);
+        defer endpoint_list.deinit();
+
+        p.endpoint = for (endpoint_list.endpoints) |e| break e else return error.InvalidEndpoint;
+    }
+
+    fn parseFallback(p: *Parse, node: Ast.Node.Index) !EndPoint {
+        var buf: [2]Ast.Node.Index = undefined;
+        const struct_init = p.ast.fullStructInit(&buf, node) orelse return error.ParseError;
+
+        var port: ?u16 = null;
+        var address: ?[]const u8 = null;
+
+        for (struct_init.ast.fields) |field_init| {
+            const name_token = p.ast.firstToken(field_init) - 2;
+            const field_name = try identifierTokenString(p, name_token);
+            if (mem.eql(u8, field_name, "port")) {
                 port = try parseInt(u16, p, field_init);
             } else if (mem.eql(u8, field_name, "address")) {
                 address = try parseString(p, field_init);
@@ -105,14 +134,12 @@ const Parse = struct {
         const endpoint_list = try network.getEndpointList(p.gpa, address.?, port.?);
         defer endpoint_list.deinit();
 
-        p.endpoint = for (endpoint_list.endpoints) |endpt| break endpt else return error.InvalidEndpoint;
+        return for (endpoint_list.endpoints) |e| break e else return error.InvalidFallback;
     }
 
     fn parseGateways(p: *Parse, node: Ast.Node.Index) !void {
-        const ast = p.ast;
-
         var buf: [2]Ast.Node.Index = undefined;
-        const array_init = ast.fullArrayInit(&buf, node) orelse return error.ParseError;
+        const array_init = p.ast.fullArrayInit(&buf, node) orelse return error.ParseError;
 
         for (array_init.ast.elements) |field_init| {
             try parseGateway(p, field_init);
@@ -144,7 +171,7 @@ const Parse = struct {
         const endpoint_list = try network.getEndpointList(p.gpa, address.?, port.?);
         defer endpoint_list.deinit();
 
-        const endpoint = for (endpoint_list.endpoints) |endpt| break endpt else return error.InvalidGateway;
+        const endpoint = for (endpoint_list.endpoints) |e| break e else return error.InvalidGateway;
 
         try p.gateways.put(p.gpa, hostname.?, endpoint);
     }

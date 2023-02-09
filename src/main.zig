@@ -217,7 +217,8 @@ fn gatewayConnect(
     config: Config,
     hostname: []const u8,
 ) !network.Socket {
-    const gateway = config.gateways.get(hostname) orelse return error.GatewayNotFound;
+    const gateway = config.gateways.get(hostname) orelse
+        (config.fallback orelse return error.GatewayNotFound);
 
     std.log.debug("Connecting to gateway {}", .{gateway});
 

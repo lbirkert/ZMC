@@ -13,4 +13,8 @@
             .port = 25567,
         },
     },
+    .fallback = .{
+        .address = "localhost",
+        .port = 25566,
+    },
 }
