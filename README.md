@@ -9,6 +9,8 @@
  \________|\__|     \__| \______/
 ```
 
+[![Nightly Build](https://github.com/KekOnTheWorld/ZMC/actions/workflows/nightly.yml/badge.svg)](https://github.com/KekOnTheWorld/ZMC/actions/workflows/nightly.yml)
+
 `ZMC` is an asynchronous reverse proxy for [Minecraft](https://minecraft.net) written in [ZIG](https://ziglang.org).
 
 It allows you to host multiple Minecraft servers reachable over different domains via a single IP address.
