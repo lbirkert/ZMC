@@ -64,6 +64,9 @@ pub fn main() !void {
     const allocator = gpa.allocator();
 
     var arg_it = try process.argsWithAllocator(allocator);
+    defer arg_it.deinit();
+
+    // Discard the executeable name
     _ = arg_it.skip();
 
     const config_file = arg_it.next() orelse "config.zon";
@@ -86,15 +89,7 @@ pub fn main() !void {
     var socket_set = try network.SocketSet.init(allocator);
     defer socket_set.deinit();
 
-    // Look for a non reserved port
-    while (true) : (config.endpoint.port += 1) {
-        server.bind(config.endpoint) catch {
-            std.log.warn("Port {} not available! Trying another one.", .{config.endpoint.port});
-            continue;
-        };
-
-        break;
-    }
+    try server.bind(config.endpoint);
 
     std.log.info("Listening on {}\n", .{
         config.endpoint,
