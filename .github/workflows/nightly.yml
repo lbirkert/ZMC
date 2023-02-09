@@ -2,9 +2,9 @@ name: Nightly Build
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
   schedule:
     - cron: '0 5 * * *' # run at 5 AM UTC
   workflow_dispatch:
