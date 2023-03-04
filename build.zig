@@ -25,8 +25,7 @@ pub fn build(b: *std.build.Builder) void {
         .optimize = optimize,
     });
 
-    const zig_network = b.dependency("zig_network", .{});
-    const network = zig_network.module("network");
+    const network = b.dependency("zig_network", .{}).module("network");
     exe.addModule("network", network);
 
     exe.install();
