@@ -24,7 +24,7 @@ jobs:
           version: master
 
       - name: Build and Test
-        run: zig build test
+        run: zig build; zig build test
   build-macos:
     runs-on: macos-latest
 
@@ -39,7 +39,7 @@ jobs:
           version: master
 
       - name: Build and Test
-        run: zig build test
+        run: zig build; zig build test
   
   build-windows:
     runs-on: windows-latest
@@ -55,4 +55,4 @@ jobs:
           version: master
 
       - name: Build and Test
-        run: zig build test
+        run: zig build; zig build test
