@@ -1,12 +1,5 @@
 const std = @import("std");
 
-const pkgs = struct {
-    const network = std.build.Pkg{
-        .name = "network",
-        .source = .{ .path = "zig-network/network.zig" },
-    };
-};
-
 pub fn build(b: *std.build.Builder) void {
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
