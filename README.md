@@ -9,7 +9,7 @@
  \________|\__|     \__| \______/
 ```
 
-[![Nightly Build](https://github.com/KekOnTheWorld/ZMC/actions/workflows/nightly.yml/badge.svg)](https://github.com/KekOnTheWorld/ZMC/actions/workflows/nightly.yml)
+[![Nightly Build](https://github.com/lbirkert/ZMC/actions/workflows/nightly.yml/badge.svg)](https://github.com/KekOnTheWorld/ZMC/actions/workflows/nightly.yml)
 
 `ZMC` is an asynchronous reverse proxy for [Minecraft](https://minecraft.net) written in [ZIG](https://ziglang.org).
 
@@ -64,7 +64,7 @@ The executable will be located in the `zig-out` directory.
 
 ## License
 
-`ZMC` is licensed under the [MIT License](https://github.com/KekOnTheWorld/ZMC/blob/main/LICENSE).
+`ZMC` is licensed under the [MIT License](https://github.com/lbirkert/ZMC/blob/main/LICENSE).
 
 <hr>
 
